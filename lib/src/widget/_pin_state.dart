@@ -9,7 +9,7 @@ class _PinInputTextFieldState extends State<PinInputTextField>
 
   late AnimationController _cursorBlinkOpacityController;
   final ValueNotifier<bool> _cursorVisibilityNotifier =
-  ValueNotifier<bool>(true);
+      ValueNotifier<bool>(true);
   Timer? _cursorTimer;
   bool _targetCursorVisibility = false;
 
@@ -133,6 +133,7 @@ class _PinInputTextFieldState extends State<PinInputTextField>
       text: _text,
       pinLength: widget.pinLength,
       decoration: widget.decoration,
+      separator: widget.separator,
       themeData: Theme.of(context),
       cursor: widget.cursor.copyWith(color: _cursorColor),
       textDirection: Directionality.of(context),
@@ -373,6 +374,7 @@ class _PinPaint extends CustomPainter {
   final int pinLength;
   final PinEntryType type;
   final PinDecoration decoration;
+  final String? separator;
   final ThemeData themeData;
   Cursor? cursor;
   TextDirection textDirection;
@@ -381,19 +383,23 @@ class _PinPaint extends CustomPainter {
     required this.text,
     required this.pinLength,
     required PinDecoration decoration,
+    this.separator,
     this.type = PinEntryType.boxTight,
     required this.themeData,
     this.cursor,
     this.textDirection = TextDirection.ltr,
-  }) : decoration = decoration.copyWith(
-    textStyle: decoration.textStyle ?? themeData.textTheme.headlineSmall,
-    errorTextStyle: decoration.errorTextStyle ??
-        themeData.textTheme.bodySmall
-            ?.copyWith(color: themeData.colorScheme.error),
-    hintTextStyle: decoration.hintTextStyle ??
-        themeData.textTheme.headlineSmall
-            ?.copyWith(color: themeData.hintColor),
-  );
+  }) : decoration = (separator == null
+                ? decoration
+                : decoration.withSeparator(separator))
+            .copyWith(
+          textStyle: decoration.textStyle ?? themeData.textTheme.headlineSmall,
+          errorTextStyle: decoration.errorTextStyle ??
+              themeData.textTheme.bodySmall
+                  ?.copyWith(color: themeData.colorScheme.error),
+          hintTextStyle: decoration.hintTextStyle ??
+              themeData.textTheme.headlineSmall
+                  ?.copyWith(color: themeData.hintColor),
+        );
 
   @override
   bool shouldRepaint(_PinPaint oldDelegate) => oldDelegate != this;
@@ -408,6 +414,7 @@ class _PinPaint extends CustomPainter {
     String? text,
     int? pinLength,
     PinDecoration? decoration,
+    String? separator,
     PinEntryType? type,
     ThemeData? themeData,
     Cursor? cursor,
@@ -416,6 +423,7 @@ class _PinPaint extends CustomPainter {
         text: text ?? this.text,
         pinLength: pinLength ?? this.pinLength,
         decoration: decoration ?? this.decoration,
+        separator: separator ?? this.separator,
         type: type ?? this.type,
         themeData: themeData ?? this.themeData,
         cursor: cursor ?? this.cursor,
@@ -424,14 +432,15 @@ class _PinPaint extends CustomPainter {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is _PinPaint &&
-              runtimeType == other.runtimeType &&
-              text == other.text &&
-              pinLength == other.pinLength &&
-              type == other.type &&
-              decoration == other.decoration &&
-              themeData == other.themeData &&
-              cursor == other.cursor;
+      other is _PinPaint &&
+          runtimeType == other.runtimeType &&
+          text == other.text &&
+          pinLength == other.pinLength &&
+          type == other.type &&
+          decoration == other.decoration &&
+          separator == other.separator &&
+          themeData == other.themeData &&
+          cursor == other.cursor;
 
   @override
   int get hashCode =>
@@ -439,6 +448,7 @@ class _PinPaint extends CustomPainter {
       pinLength.hashCode ^
       type.hashCode ^
       decoration.hashCode ^
+      separator.hashCode ^
       themeData.hashCode ^
       cursor.hashCode;
 }

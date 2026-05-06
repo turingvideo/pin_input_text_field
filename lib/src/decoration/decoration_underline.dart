@@ -29,6 +29,7 @@ class UnderlineDecoration extends PinDecoration
     TextStyle? errorTextStyle,
     String? hintText,
     TextStyle? hintTextStyle,
+    String? separator,
     this.gapSpace = 16.0,
     this.gapSpaces,
     required this.colorBuilder,
@@ -42,6 +43,7 @@ class UnderlineDecoration extends PinDecoration
           errorTextStyle: errorTextStyle,
           hintText: hintText,
           hintTextStyle: hintTextStyle,
+          separator: separator,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -65,6 +67,7 @@ class UnderlineDecoration extends PinDecoration
       errorTextStyle: errorTextStyle ?? this.errorTextStyle,
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
+      separator: separator,
       colorBuilder: colorBuilder,
       gapSpace: gapSpace,
       lineHeight: lineHeight,
@@ -78,6 +81,25 @@ class UnderlineDecoration extends PinDecoration
   void notifyChange(String? pin) {
     colorBuilder.notifyChange(pin!);
     bgColorBuilder?.notifyChange(pin);
+  }
+
+  @override
+  PinDecoration withSeparator(String? separator) {
+    return UnderlineDecoration(
+      textStyle: textStyle,
+      obscureStyle: obscureStyle,
+      errorText: errorText,
+      errorTextStyle: errorTextStyle,
+      hintText: hintText,
+      hintTextStyle: hintTextStyle,
+      separator: separator,
+      colorBuilder: colorBuilder,
+      gapSpace: gapSpace,
+      lineHeight: lineHeight,
+      lineStrokeCap: lineStrokeCap,
+      gapSpaces: gapSpaces,
+      bgColorBuilder: bgColorBuilder,
+    );
   }
 
   @override
@@ -129,6 +151,16 @@ class UnderlineDecoration extends PinDecoration
 
     /// Calculate the width of each underline.
     double singleWidth = (size.width - gapTotalLength) / pinLength;
+    final separatorCenterXs = List<double>.generate(pinLength - 1, (index) {
+      final currentCenterX = singleWidth * index +
+          singleWidth / 2 +
+          actualGapSpaces.take(index).sumList();
+      final nextIndex = index + 1;
+      final nextCenterX = singleWidth * nextIndex +
+          singleWidth / 2 +
+          actualGapSpaces.take(nextIndex).sumList();
+      return (currentCenterX + nextCenterX) / 2;
+    });
 
     for (int i = 0; i < pinLength; i++) {
       if (errorText != null && errorText!.isNotEmpty) {
@@ -138,15 +170,21 @@ class UnderlineDecoration extends PinDecoration
       } else {
         underlinePaint.color = colorBuilder.indexProperty(i);
       }
-      canvas.drawLine(Offset(startX, startY),
-          Offset(startX + singleWidth, startY), underlinePaint);
+      canvas.drawLine(
+        Offset(startX, startY),
+        Offset(startX + singleWidth, startY),
+        underlinePaint,
+      );
       if (insidePaint != null) {
         canvas.drawRect(
-            Rect.fromLTWH(startX, 0, singleWidth, startY - lineHeight / 2),
-            insidePaint..color = bgColorBuilder!.indexProperty(i));
+          Rect.fromLTWH(startX, 0, singleWidth, startY - lineHeight / 2),
+          insidePaint..color = bgColorBuilder!.indexProperty(i),
+        );
       }
       startX += singleWidth + (i == pinLength - 1 ? 0 : actualGapSpaces[i]);
     }
+
+    drawSeparators(canvas, separatorCenterXs, mainHeight, textDirection);
 
     /// The char index of the [text]
     var index = 0;
@@ -165,10 +203,7 @@ class UnderlineDecoration extends PinDecoration
         code = String.fromCharCode(rune);
       }
       textPainter = TextPainter(
-        text: TextSpan(
-          style: textStyle,
-          text: code,
-        ),
+        text: TextSpan(style: textStyle, text: code),
         textAlign: TextAlign.center,
         textDirection: textDirection,
       );
@@ -197,10 +232,7 @@ class UnderlineDecoration extends PinDecoration
       hintText!.substring(index).runes.forEach((rune) {
         String code = String.fromCharCode(rune);
         textPainter = TextPainter(
-          text: TextSpan(
-            style: hintTextStyle,
-            text: code,
-          ),
+          text: TextSpan(style: hintTextStyle, text: code),
           textAlign: TextAlign.center,
           textDirection: textDirection,
         );

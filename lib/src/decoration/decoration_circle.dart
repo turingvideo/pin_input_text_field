@@ -25,6 +25,7 @@ class CirclePinDecoration extends PinDecoration
     TextStyle? errorTextStyle,
     String? hintText,
     TextStyle? hintTextStyle,
+    String? separator,
     this.gapSpace = 16,
     this.gapSpaces,
     required this.strokeColorBuilder,
@@ -37,6 +38,7 @@ class CirclePinDecoration extends PinDecoration
           errorTextStyle: errorTextStyle,
           hintText: hintText,
           hintTextStyle: hintTextStyle,
+          separator: separator,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -57,6 +59,7 @@ class CirclePinDecoration extends PinDecoration
       errorTextStyle: errorTextStyle ?? this.errorTextStyle,
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
+      separator: separator,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       gapSpace: gapSpace,
@@ -72,6 +75,24 @@ class CirclePinDecoration extends PinDecoration
   void notifyChange(String? pin) {
     strokeColorBuilder.notifyChange(pin!);
     bgColorBuilder?.notifyChange(pin);
+  }
+
+  @override
+  PinDecoration withSeparator(String? separator) {
+    return CirclePinDecoration(
+      textStyle: textStyle,
+      obscureStyle: obscureStyle,
+      errorText: errorText,
+      errorTextStyle: errorTextStyle,
+      hintText: hintText,
+      hintTextStyle: hintTextStyle,
+      separator: separator,
+      strokeColorBuilder: strokeColorBuilder,
+      strokeWidth: strokeWidth,
+      gapSpace: gapSpace,
+      gapSpaces: gapSpaces,
+      bgColorBuilder: bgColorBuilder,
+    );
   }
 
   @override
@@ -123,9 +144,9 @@ class CirclePinDecoration extends PinDecoration
     } else {
       radius = mainHeight / 2 - strokeWidth / 2;
       actualGapSpaces = List.filled(
-          pinLength - 1,
-          (size.width - strokeWidth - radius * 2 * pinLength) /
-              (pinLength - 1));
+        pinLength - 1,
+        (size.width - strokeWidth - radius * 2 * pinLength) / (pinLength - 1),
+      );
     }
 
     double startX = strokeWidth / 2;
@@ -144,11 +165,7 @@ class CirclePinDecoration extends PinDecoration
         borderPaint.color = strokeColorBuilder.indexProperty(i);
       }
       centerPoints[i] = startX + radius;
-      canvas.drawCircle(
-        Offset(centerPoints[i], startY),
-        radius,
-        borderPaint,
-      );
+      canvas.drawCircle(Offset(centerPoints[i], startY), radius, borderPaint);
       if (insidePaint != null) {
         canvas.drawCircle(
           Offset(startX + radius, startY),
@@ -158,6 +175,16 @@ class CirclePinDecoration extends PinDecoration
       }
       startX += (radius * 2 + (i == pinLength - 1 ? 0 : actualGapSpaces[i]));
     }
+
+    drawSeparators(
+      canvas,
+      List<double>.generate(
+        pinLength - 1,
+        (index) => (centerPoints[index] + centerPoints[index + 1]) / 2,
+      ),
+      mainHeight,
+      textDirection,
+    );
 
     /// The char index of the [text]
     var index = 0;
@@ -175,10 +202,7 @@ class CirclePinDecoration extends PinDecoration
         code = String.fromCharCode(rune);
       }
       textPainter = TextPainter(
-        text: TextSpan(
-          style: textStyle,
-          text: code,
-        ),
+        text: TextSpan(style: textStyle, text: code),
         textAlign: TextAlign.center,
         textDirection: textDirection,
       );
@@ -191,11 +215,9 @@ class CirclePinDecoration extends PinDecoration
         startY = mainHeight / 2 - textPainter.height / 2;
       }
       textPainter.paint(
-          canvas,
-          Offset(
-            centerPoints[index] - textPainter.width / 2,
-            startY,
-          ));
+        canvas,
+        Offset(centerPoints[index] - textPainter.width / 2, startY),
+      );
       index++;
     }
 
@@ -208,10 +230,7 @@ class CirclePinDecoration extends PinDecoration
       hintText!.substring(index).runes.forEach((rune) {
         String code = String.fromCharCode(rune);
         textPainter = TextPainter(
-          text: TextSpan(
-            style: hintTextStyle,
-            text: code,
-          ),
+          text: TextSpan(style: hintTextStyle, text: code),
           textAlign: TextAlign.center,
           textDirection: textDirection,
         );
@@ -225,8 +244,10 @@ class CirclePinDecoration extends PinDecoration
         }
 
         startY = mainHeight / 2 - textPainter.height / 2;
-        textPainter.paint(canvas,
-            Offset(centerPoints[index] - textPainter.width / 2, startY));
+        textPainter.paint(
+          canvas,
+          Offset(centerPoints[index] - textPainter.width / 2, startY),
+        );
         index++;
       });
     }

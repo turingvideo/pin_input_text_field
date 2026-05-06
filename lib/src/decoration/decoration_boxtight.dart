@@ -21,6 +21,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
     TextStyle? errorTextStyle,
     String? hintText,
     TextStyle? hintTextStyle,
+    String? separator,
     this.strokeWidth = 1.0,
     this.radius = const Radius.circular(8.0),
     this.strokeColor = Colors.cyan,
@@ -32,6 +33,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
           errorTextStyle: errorTextStyle,
           hintText: hintText,
           hintTextStyle: hintTextStyle,
+          separator: separator,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -55,6 +57,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
       errorTextStyle: errorTextStyle ?? this.errorTextStyle,
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
+      separator: separator,
       strokeColor: strokeColor,
       strokeWidth: strokeWidth,
       radius: radius,
@@ -65,6 +68,23 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
   @override
   void notifyChange(String pin) {
     bgColorBuilder?.notifyChange(pin);
+  }
+
+  @override
+  PinDecoration withSeparator(String? separator) {
+    return BoxTightDecoration(
+      textStyle: textStyle,
+      obscureStyle: obscureStyle,
+      errorText: errorText,
+      errorTextStyle: errorTextStyle,
+      hintText: hintText,
+      hintTextStyle: hintTextStyle,
+      separator: separator,
+      strokeColor: strokeColor,
+      strokeWidth: strokeWidth,
+      radius: radius,
+      bgColorBuilder: bgColorBuilder,
+    );
   }
 
   @override
@@ -116,6 +136,15 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
     /// Calculate the width of each underline.
     double singleWidth =
         (size.width - strokeWidth * (pinLength + 1)) / pinLength;
+    final separatorCenterXs = List<double>.generate(pinLength - 1, (index) {
+      final currentCenterX =
+          strokeWidth * (index + 1) + singleWidth * index + singleWidth / 2;
+      final nextIndex = index + 1;
+      final nextCenterX = strokeWidth * (nextIndex + 1) +
+          singleWidth * nextIndex +
+          singleWidth / 2;
+      return (currentCenterX + nextCenterX) / 2;
+    });
 
     for (int i = 0; i < pinLength; i++) {
       if (insidePaint != null) {
@@ -141,9 +170,14 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
           strokeWidth * i +
           strokeWidth / 2 +
           singleWidth * (i - 1);
-      canvas.drawLine(Offset(offsetX, strokeWidth),
-          Offset(offsetX, mainHeight - strokeWidth), borderPaint);
+      canvas.drawLine(
+        Offset(offsetX, strokeWidth),
+        Offset(offsetX, mainHeight - strokeWidth),
+        borderPaint,
+      );
     }
+
+    drawSeparators(canvas, separatorCenterXs, mainHeight, textDirection);
 
     /// The char index of the [text]
     var index = 0;
@@ -162,10 +196,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
         code = String.fromCharCode(rune);
       }
       textPainter = TextPainter(
-        text: TextSpan(
-          style: textStyle,
-          text: code,
-        ),
+        text: TextSpan(style: textStyle, text: code),
         textAlign: TextAlign.center,
         textDirection: textDirection,
       );
@@ -194,10 +225,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
       hintText!.substring(index).runes.forEach((rune) {
         String code = String.fromCharCode(rune);
         textPainter = TextPainter(
-          text: TextSpan(
-            style: hintTextStyle,
-            text: code,
-          ),
+          text: TextSpan(style: hintTextStyle, text: code),
           textAlign: TextAlign.center,
           textDirection: textDirection,
         );

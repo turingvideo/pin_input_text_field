@@ -10,13 +10,7 @@ part 'decoration_boxtight.dart';
 part 'decoration_circle.dart';
 part 'decoration_underline.dart';
 
-enum PinEntryType {
-  underline,
-  boxTight,
-  boxLoose,
-  circle,
-  customized,
-}
+enum PinEntryType { underline, boxTight, boxLoose, circle, customized }
 
 class SupportGap {
   /// The adjacent box gap.
@@ -43,6 +37,11 @@ abstract class PinDecoration {
 
   final TextStyle? hintTextStyle;
 
+  /// Text painted between every two adjacent pin cells.
+  ///
+  /// When null or empty, no separator is drawn.
+  final String? separator;
+
   // The background color of index character
   final ColorBuilder? baseBgColorBuilder;
 
@@ -55,6 +54,7 @@ abstract class PinDecoration {
     this.errorTextStyle,
     this.hintText,
     this.hintTextStyle,
+    this.separator,
     this.baseBgColorBuilder,
   });
 
@@ -81,6 +81,32 @@ abstract class PinDecoration {
     ColorBuilder? bgColorBuilder,
   });
 
+  PinDecoration withSeparator(String? separator) => this;
+
+  void drawSeparators(
+    Canvas canvas,
+    List<double> centerXs,
+    double mainHeight,
+    TextDirection textDirection,
+  ) {
+    final separatorText = separator;
+    if (separatorText == null || separatorText.isEmpty) return;
+
+    final textPainter = TextPainter(
+      text: TextSpan(style: textStyle, text: separatorText),
+      textAlign: TextAlign.center,
+      textDirection: textDirection,
+    )..layout();
+
+    final startY = mainHeight / 2 - textPainter.height / 2;
+    for (final centerX in centerXs) {
+      textPainter.paint(
+        canvas,
+        Offset(centerX - textPainter.width / 2, startY),
+      );
+    }
+  }
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -92,6 +118,7 @@ abstract class PinDecoration {
           errorTextStyle == other.errorTextStyle &&
           hintText == other.hintText &&
           hintTextStyle == other.hintTextStyle &&
+          separator == other.separator &&
           baseBgColorBuilder == other.baseBgColorBuilder;
 
   @override
@@ -102,10 +129,11 @@ abstract class PinDecoration {
       errorTextStyle.hashCode ^
       hintText.hashCode ^
       hintTextStyle.hashCode ^
+      separator.hashCode ^
       baseBgColorBuilder.hashCode;
 
   @override
   String toString() {
-    return 'PinDecoration{textStyle: $textStyle, obscureStyle: $obscureStyle, errorText: $errorText, errorTextStyle: $errorTextStyle, hintText: $hintText, hintTextStyle: $hintTextStyle, bgColorBuilder: $baseBgColorBuilder}';
+    return 'PinDecoration{textStyle: $textStyle, obscureStyle: $obscureStyle, errorText: $errorText, errorTextStyle: $errorTextStyle, hintText: $hintText, hintTextStyle: $hintTextStyle, separator: $separator, bgColorBuilder: $baseBgColorBuilder}';
   }
 }

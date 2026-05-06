@@ -29,6 +29,7 @@ class BoxLooseDecoration extends PinDecoration
     TextStyle? errorTextStyle,
     String? hintText,
     TextStyle? hintTextStyle,
+    String? separator,
     this.radius = const Radius.circular(8.0),
     this.strokeWidth = 1.0,
     this.gapSpace = 16.0,
@@ -42,6 +43,7 @@ class BoxLooseDecoration extends PinDecoration
           errorTextStyle: errorTextStyle,
           hintText: hintText,
           hintTextStyle: hintTextStyle,
+          separator: separator,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -65,6 +67,7 @@ class BoxLooseDecoration extends PinDecoration
       errorTextStyle: errorTextStyle ?? this.errorTextStyle,
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
+      separator: separator,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       radius: radius,
@@ -78,6 +81,25 @@ class BoxLooseDecoration extends PinDecoration
   void notifyChange(String pin) {
     strokeColorBuilder.notifyChange(pin);
     bgColorBuilder?.notifyChange(pin);
+  }
+
+  @override
+  PinDecoration withSeparator(String? separator) {
+    return BoxLooseDecoration(
+      textStyle: textStyle,
+      obscureStyle: obscureStyle,
+      errorText: errorText,
+      errorTextStyle: errorTextStyle,
+      hintText: hintText,
+      hintTextStyle: hintTextStyle,
+      separator: separator,
+      strokeColorBuilder: strokeColorBuilder,
+      strokeWidth: strokeWidth,
+      radius: radius,
+      gapSpace: gapSpace,
+      gapSpaces: gapSpaces,
+      bgColorBuilder: bgColorBuilder,
+    );
   }
 
   @override
@@ -115,6 +137,20 @@ class BoxLooseDecoration extends PinDecoration
     /// Calculate the width of each underline.
     double singleWidth =
         (size.width - strokeWidth * 2 * pinLength - gapTotalLength) / pinLength;
+    final separatorCenterXs = List<double>.generate(pinLength - 1, (index) {
+      final currentCenterX = singleWidth * index +
+          singleWidth / 2 +
+          actualGapSpaces.take(index).sumList() +
+          strokeWidth * index * 2 +
+          strokeWidth;
+      final nextIndex = index + 1;
+      final nextCenterX = singleWidth * nextIndex +
+          singleWidth / 2 +
+          actualGapSpaces.take(nextIndex).sumList() +
+          strokeWidth * nextIndex * 2 +
+          strokeWidth;
+      return (currentCenterX + nextCenterX) / 2;
+    });
 
     var startX = strokeWidth / 2;
     var startY = mainHeight - strokeWidth / 2;
@@ -138,30 +174,35 @@ class BoxLooseDecoration extends PinDecoration
         borderPaint.color = strokeColorBuilder.indexProperty(i);
       }
       RRect rRect = RRect.fromRectAndRadius(
-          Rect.fromLTRB(
-            startX,
-            strokeWidth / 2,
-            startX + singleWidth + strokeWidth,
-            startY,
-          ),
-          radius);
+        Rect.fromLTRB(
+          startX,
+          strokeWidth / 2,
+          startX + singleWidth + strokeWidth,
+          startY,
+        ),
+        radius,
+      );
       canvas.drawRRect(rRect, borderPaint);
       if (insidePaint != null) {
         canvas.drawRRect(
-            RRect.fromRectAndRadius(
-                Rect.fromLTRB(
-                  startX + strokeWidth / 2,
-                  strokeWidth,
-                  startX + singleWidth + strokeWidth / 2,
-                  startY - strokeWidth / 2,
-                ),
-                getInnerRadius(radius, strokeWidth)),
-            insidePaint..color = bgColorBuilder!.indexProperty(i));
+          RRect.fromRectAndRadius(
+            Rect.fromLTRB(
+              startX + strokeWidth / 2,
+              strokeWidth,
+              startX + singleWidth + strokeWidth / 2,
+              startY - strokeWidth / 2,
+            ),
+            getInnerRadius(radius, strokeWidth),
+          ),
+          insidePaint..color = bgColorBuilder!.indexProperty(i),
+        );
       }
       startX += singleWidth +
           strokeWidth * 2 +
           (i == pinLength - 1 ? 0 : actualGapSpaces[i]);
     }
+
+    drawSeparators(canvas, separatorCenterXs, mainHeight, textDirection);
 
     /// The char index of the [text]
     var index = 0;
@@ -179,10 +220,7 @@ class BoxLooseDecoration extends PinDecoration
         code = String.fromCharCode(rune);
       }
       textPainter = TextPainter(
-        text: TextSpan(
-          style: textStyle,
-          text: code,
-        ),
+        text: TextSpan(style: textStyle, text: code),
         textAlign: TextAlign.center,
         textDirection: textDirection,
       );
@@ -213,10 +251,7 @@ class BoxLooseDecoration extends PinDecoration
       hintText!.substring(index).runes.forEach((rune) {
         String code = String.fromCharCode(rune);
         textPainter = TextPainter(
-          text: TextSpan(
-            style: hintTextStyle,
-            text: code,
-          ),
+          text: TextSpan(style: hintTextStyle, text: code),
           textAlign: TextAlign.center,
           textDirection: textDirection,
         );

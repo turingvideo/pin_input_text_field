@@ -21,6 +21,12 @@ class PinInputTextField extends StatefulWidget {
   /// Decorate the pin.
   final PinDecoration decoration;
 
+  /// Text painted between every two adjacent pin cells.
+  ///
+  /// When null, the decoration's separator is used. If both are null, no
+  /// separator is drawn.
+  final String? separator;
+
   /// Just like [TextField]'s inputFormatter.
   final List<TextInputFormatter>? inputFormatters;
 
@@ -57,7 +63,7 @@ class PinInputTextField extends StatefulWidget {
   /// Same as [TextField]'s toolbarOptions
   @Deprecated(
     'Use `contextMenuBuilder` instead. '
-        'This feature was deprecated after flutter v3.3.0-0.5.pre.',
+    'This feature was deprecated after flutter v3.3.0-0.5.pre.',
   )
   final ToolbarOptions? toolbarOptions;
 
@@ -77,6 +83,7 @@ class PinInputTextField extends StatefulWidget {
     this.pinLength = _kDefaultPinLength,
     this.onSubmit,
     required this.decoration,
+    this.separator,
     this.inputFormatters,
     this.keyboardType = TextInputType.phone,
     this.controller,
@@ -131,6 +138,7 @@ class PinInputTextFormField extends FormField<String> {
     this.pinLength = _kDefaultPinLength,
     ValueChanged<String>? onSubmit,
     required PinDecoration decoration,
+    String? separator,
     List<TextInputFormatter>? inputFormatters,
     TextInputType keyboardType = TextInputType.phone,
     FocusNode? focusNode,
@@ -163,6 +171,7 @@ class PinInputTextFormField extends FormField<String> {
                 pinLength: pinLength,
                 onSubmit: onSubmit,
                 decoration: decoration.copyWith(errorText: field.errorText),
+                separator: separator,
                 inputFormatters: inputFormatters,
                 keyboardType: keyboardType,
                 controller:
