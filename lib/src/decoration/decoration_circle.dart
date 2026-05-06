@@ -26,6 +26,7 @@ class CirclePinDecoration extends PinDecoration
     String? hintText,
     TextStyle? hintTextStyle,
     String? separator,
+    int separatorInterval = 1,
     this.gapSpace = 16,
     this.gapSpaces,
     required this.strokeColorBuilder,
@@ -39,6 +40,7 @@ class CirclePinDecoration extends PinDecoration
           hintText: hintText,
           hintTextStyle: hintTextStyle,
           separator: separator,
+          separatorInterval: separatorInterval,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -60,6 +62,7 @@ class CirclePinDecoration extends PinDecoration
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       gapSpace: gapSpace,
@@ -78,7 +81,10 @@ class CirclePinDecoration extends PinDecoration
   }
 
   @override
-  PinDecoration withSeparator(String? separator) {
+  PinDecoration withSeparator({
+    String? separator,
+    int? separatorInterval,
+  }) {
     return CirclePinDecoration(
       textStyle: textStyle,
       obscureStyle: obscureStyle,
@@ -87,6 +93,7 @@ class CirclePinDecoration extends PinDecoration
       hintText: hintText,
       hintTextStyle: hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval ?? this.separatorInterval,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       gapSpace: gapSpace,

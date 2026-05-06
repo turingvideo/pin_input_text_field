@@ -27,6 +27,11 @@ class PinInputTextField extends StatefulWidget {
   /// separator is drawn.
   final String? separator;
 
+  /// Draws [separator] after every [separatorInterval] pin cells.
+  ///
+  /// Defaults to 1, which draws it between every two adjacent pin cells.
+  final int separatorInterval;
+
   /// Just like [TextField]'s inputFormatter.
   final List<TextInputFormatter>? inputFormatters;
 
@@ -84,6 +89,7 @@ class PinInputTextField extends StatefulWidget {
     this.onSubmit,
     required this.decoration,
     this.separator,
+    this.separatorInterval = 1,
     this.inputFormatters,
     this.keyboardType = TextInputType.phone,
     this.controller,
@@ -105,6 +111,7 @@ class PinInputTextField extends StatefulWidget {
         /// pinLength must larger than 0.
         /// If pinEditingController isn't null, guarantee the [pinLength] equals to the pinEditingController's _pinMaxLength
         assert(pinLength > 0),
+        assert(separatorInterval > 0),
 
         /// Hint length must equal to the [pinLength].
         assert(decoration.hintText == null ||
@@ -139,6 +146,7 @@ class PinInputTextFormField extends FormField<String> {
     ValueChanged<String>? onSubmit,
     required PinDecoration decoration,
     String? separator,
+    int separatorInterval = 1,
     List<TextInputFormatter>? inputFormatters,
     TextInputType keyboardType = TextInputType.phone,
     FocusNode? focusNode,
@@ -172,6 +180,7 @@ class PinInputTextFormField extends FormField<String> {
                 onSubmit: onSubmit,
                 decoration: decoration.copyWith(errorText: field.errorText),
                 separator: separator,
+                separatorInterval: separatorInterval,
                 inputFormatters: inputFormatters,
                 keyboardType: keyboardType,
                 controller:

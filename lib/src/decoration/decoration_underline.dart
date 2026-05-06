@@ -30,6 +30,7 @@ class UnderlineDecoration extends PinDecoration
     String? hintText,
     TextStyle? hintTextStyle,
     String? separator,
+    int separatorInterval = 1,
     this.gapSpace = 16.0,
     this.gapSpaces,
     required this.colorBuilder,
@@ -44,6 +45,7 @@ class UnderlineDecoration extends PinDecoration
           hintText: hintText,
           hintTextStyle: hintTextStyle,
           separator: separator,
+          separatorInterval: separatorInterval,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -68,6 +70,7 @@ class UnderlineDecoration extends PinDecoration
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval,
       colorBuilder: colorBuilder,
       gapSpace: gapSpace,
       lineHeight: lineHeight,
@@ -84,7 +87,10 @@ class UnderlineDecoration extends PinDecoration
   }
 
   @override
-  PinDecoration withSeparator(String? separator) {
+  PinDecoration withSeparator({
+    String? separator,
+    int? separatorInterval,
+  }) {
     return UnderlineDecoration(
       textStyle: textStyle,
       obscureStyle: obscureStyle,
@@ -93,6 +99,7 @@ class UnderlineDecoration extends PinDecoration
       hintText: hintText,
       hintTextStyle: hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval ?? this.separatorInterval,
       colorBuilder: colorBuilder,
       gapSpace: gapSpace,
       lineHeight: lineHeight,

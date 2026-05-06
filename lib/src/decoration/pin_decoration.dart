@@ -42,6 +42,12 @@ abstract class PinDecoration {
   /// When null or empty, no separator is drawn.
   final String? separator;
 
+  /// Controls where [separator] is drawn.
+  ///
+  /// Defaults to 1, which draws the separator between every two adjacent pin
+  /// cells. For example, 2 draws it after every 2 pin cells.
+  final int separatorInterval;
+
   // The background color of index character
   final ColorBuilder? baseBgColorBuilder;
 
@@ -55,8 +61,9 @@ abstract class PinDecoration {
     this.hintText,
     this.hintTextStyle,
     this.separator,
+    this.separatorInterval = 1,
     this.baseBgColorBuilder,
-  });
+  }) : assert(separatorInterval > 0);
 
   void drawPin(
     Canvas canvas,
@@ -81,7 +88,11 @@ abstract class PinDecoration {
     ColorBuilder? bgColorBuilder,
   });
 
-  PinDecoration withSeparator(String? separator) => this;
+  PinDecoration withSeparator({
+    String? separator,
+    int? separatorInterval,
+  }) =>
+      this;
 
   void drawSeparators(
     Canvas canvas,
@@ -99,10 +110,11 @@ abstract class PinDecoration {
     )..layout();
 
     final startY = mainHeight / 2 - textPainter.height / 2;
-    for (final centerX in centerXs) {
+    for (int index = 0; index < centerXs.length; index++) {
+      if ((index + 1) % separatorInterval != 0) continue;
       textPainter.paint(
         canvas,
-        Offset(centerX - textPainter.width / 2, startY),
+        Offset(centerXs[index] - textPainter.width / 2, startY),
       );
     }
   }
@@ -119,6 +131,7 @@ abstract class PinDecoration {
           hintText == other.hintText &&
           hintTextStyle == other.hintTextStyle &&
           separator == other.separator &&
+          separatorInterval == other.separatorInterval &&
           baseBgColorBuilder == other.baseBgColorBuilder;
 
   @override
@@ -130,10 +143,11 @@ abstract class PinDecoration {
       hintText.hashCode ^
       hintTextStyle.hashCode ^
       separator.hashCode ^
+      separatorInterval.hashCode ^
       baseBgColorBuilder.hashCode;
 
   @override
   String toString() {
-    return 'PinDecoration{textStyle: $textStyle, obscureStyle: $obscureStyle, errorText: $errorText, errorTextStyle: $errorTextStyle, hintText: $hintText, hintTextStyle: $hintTextStyle, separator: $separator, bgColorBuilder: $baseBgColorBuilder}';
+    return 'PinDecoration{textStyle: $textStyle, obscureStyle: $obscureStyle, errorText: $errorText, errorTextStyle: $errorTextStyle, hintText: $hintText, hintTextStyle: $hintTextStyle, separator: $separator, separatorInterval: $separatorInterval, bgColorBuilder: $baseBgColorBuilder}';
   }
 }

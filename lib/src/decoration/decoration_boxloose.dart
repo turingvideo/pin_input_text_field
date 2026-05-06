@@ -30,6 +30,7 @@ class BoxLooseDecoration extends PinDecoration
     String? hintText,
     TextStyle? hintTextStyle,
     String? separator,
+    int separatorInterval = 1,
     this.radius = const Radius.circular(8.0),
     this.strokeWidth = 1.0,
     this.gapSpace = 16.0,
@@ -44,6 +45,7 @@ class BoxLooseDecoration extends PinDecoration
           hintText: hintText,
           hintTextStyle: hintTextStyle,
           separator: separator,
+          separatorInterval: separatorInterval,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -68,6 +70,7 @@ class BoxLooseDecoration extends PinDecoration
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       radius: radius,
@@ -84,7 +87,10 @@ class BoxLooseDecoration extends PinDecoration
   }
 
   @override
-  PinDecoration withSeparator(String? separator) {
+  PinDecoration withSeparator({
+    String? separator,
+    int? separatorInterval,
+  }) {
     return BoxLooseDecoration(
       textStyle: textStyle,
       obscureStyle: obscureStyle,
@@ -93,6 +99,7 @@ class BoxLooseDecoration extends PinDecoration
       hintText: hintText,
       hintTextStyle: hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval ?? this.separatorInterval,
       strokeColorBuilder: strokeColorBuilder,
       strokeWidth: strokeWidth,
       radius: radius,

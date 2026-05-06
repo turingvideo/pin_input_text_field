@@ -134,6 +134,7 @@ class _PinInputTextFieldState extends State<PinInputTextField>
       pinLength: widget.pinLength,
       decoration: widget.decoration,
       separator: widget.separator,
+      separatorInterval: widget.separatorInterval,
       themeData: Theme.of(context),
       cursor: widget.cursor.copyWith(color: _cursorColor),
       textDirection: Directionality.of(context),
@@ -375,6 +376,7 @@ class _PinPaint extends CustomPainter {
   final PinEntryType type;
   final PinDecoration decoration;
   final String? separator;
+  final int separatorInterval;
   final ThemeData themeData;
   Cursor? cursor;
   TextDirection textDirection;
@@ -384,13 +386,17 @@ class _PinPaint extends CustomPainter {
     required this.pinLength,
     required PinDecoration decoration,
     this.separator,
+    this.separatorInterval = 1,
     this.type = PinEntryType.boxTight,
     required this.themeData,
     this.cursor,
     this.textDirection = TextDirection.ltr,
   }) : decoration = (separator == null
                 ? decoration
-                : decoration.withSeparator(separator))
+                : decoration.withSeparator(
+                    separator: separator,
+                    separatorInterval: separatorInterval,
+                  ))
             .copyWith(
           textStyle: decoration.textStyle ?? themeData.textTheme.headlineSmall,
           errorTextStyle: decoration.errorTextStyle ??
@@ -415,6 +421,7 @@ class _PinPaint extends CustomPainter {
     int? pinLength,
     PinDecoration? decoration,
     String? separator,
+    int? separatorInterval,
     PinEntryType? type,
     ThemeData? themeData,
     Cursor? cursor,
@@ -424,6 +431,7 @@ class _PinPaint extends CustomPainter {
         pinLength: pinLength ?? this.pinLength,
         decoration: decoration ?? this.decoration,
         separator: separator ?? this.separator,
+        separatorInterval: separatorInterval ?? this.separatorInterval,
         type: type ?? this.type,
         themeData: themeData ?? this.themeData,
         cursor: cursor ?? this.cursor,
@@ -439,6 +447,7 @@ class _PinPaint extends CustomPainter {
           type == other.type &&
           decoration == other.decoration &&
           separator == other.separator &&
+          separatorInterval == other.separatorInterval &&
           themeData == other.themeData &&
           cursor == other.cursor;
 
@@ -449,6 +458,7 @@ class _PinPaint extends CustomPainter {
       type.hashCode ^
       decoration.hashCode ^
       separator.hashCode ^
+      separatorInterval.hashCode ^
       themeData.hashCode ^
       cursor.hashCode;
 }

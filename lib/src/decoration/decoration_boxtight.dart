@@ -22,6 +22,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
     String? hintText,
     TextStyle? hintTextStyle,
     String? separator,
+    int separatorInterval = 1,
     this.strokeWidth = 1.0,
     this.radius = const Radius.circular(8.0),
     this.strokeColor = Colors.cyan,
@@ -34,6 +35,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
           hintText: hintText,
           hintTextStyle: hintTextStyle,
           separator: separator,
+          separatorInterval: separatorInterval,
           baseBgColorBuilder: bgColorBuilder,
         );
 
@@ -58,6 +60,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
       hintText: hintText ?? this.hintText,
       hintTextStyle: hintTextStyle ?? this.hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval,
       strokeColor: strokeColor,
       strokeWidth: strokeWidth,
       radius: radius,
@@ -71,7 +74,10 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
   }
 
   @override
-  PinDecoration withSeparator(String? separator) {
+  PinDecoration withSeparator({
+    String? separator,
+    int? separatorInterval,
+  }) {
     return BoxTightDecoration(
       textStyle: textStyle,
       obscureStyle: obscureStyle,
@@ -80,6 +86,7 @@ class BoxTightDecoration extends PinDecoration with CursorPaint {
       hintText: hintText,
       hintTextStyle: hintTextStyle,
       separator: separator,
+      separatorInterval: separatorInterval ?? this.separatorInterval,
       strokeColor: strokeColor,
       strokeWidth: strokeWidth,
       radius: radius,
